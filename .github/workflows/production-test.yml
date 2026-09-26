@@ -8,8 +8,9 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
+      PYTHONPATH: ${{ github.workspace }}
       JWT_SECRET_KEY: ci-secret-key-at-least-32-bytes-long
       DEMO_PASSWORD_HASH: $2b$12$LQv3c1yqBWxkQ5u7GQ0xqOe0bXn6H2KQj9yV4jG6Qk0kQxV7s6h9e
       POSTGRES_PASSWORD: ci-password
