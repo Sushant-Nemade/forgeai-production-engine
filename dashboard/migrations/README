@@ -1,0 +1,1 @@
+ForgeAI Alembic migration environment. Run `alembic upgrade head` during application startup/deployment.

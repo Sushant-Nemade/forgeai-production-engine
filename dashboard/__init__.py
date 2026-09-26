@@ -1,0 +1,1 @@
+"""ForgeAI dashboard service."""
