@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -48,14 +48,14 @@ class Orchestrator:
             ctx.transition(State.SCHEMA_MAPPED)
 
             endpoints = await self.developer.run(schema)
-            ctx.artifacts["endpoints"] = [e.__dict__ for e in endpoints]
+            ctx.artifacts["endpoints"] = [asdict(e) for e in endpoints]
             ctx.transition(State.API_GENERATED)
 
             for cycle in range(self.max_remediation_cycles + 1):
                 report = await self.qa.run(source_root)
                 ctx.artifacts["qa_report"] = {
                     "passed": report.passed,
-                    "findings": [f.__dict__ for f in report.findings],
+                    "findings": [asdict(f) for f in report.findings],
                     "cycle": cycle,
                 }
                 ctx.transition(State.QA_SCANNED)
@@ -66,8 +66,6 @@ class Orchestrator:
                     break
                 ctx.transition(State.REMEDIATING)
                 await asyncio.sleep(0)
-                # Remediation is deliberately fail-closed: findings are returned to the
-                # caller rather than silently rewriting source code without a reviewable plan.
             ctx.transition(State.FAILED)
             return ctx
         except Exception as exc:

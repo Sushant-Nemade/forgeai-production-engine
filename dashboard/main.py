@@ -11,7 +11,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core_engine.orchestrator import Orchestrator
-from .auth import create_access_token, require_user, verify_password
+from .auth import bearer, create_access_token, require_user, verify_password
 from .db import get_session
 from .models import FactoryRun
 from .schemas import RunRequest, RunResponse, TokenResponse
@@ -56,7 +56,7 @@ async def token(request: Request) -> TokenResponse:
 @app.post("/api/runs", response_model=RunResponse, tags=["factory"])
 async def create_run(
     payload: RunRequest,
-    credentials: HTTPAuthorizationCredentials = Depends(),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
     session: AsyncSession = Depends(get_session),
 ) -> RunResponse:
     require_user(credentials)
@@ -70,7 +70,7 @@ async def create_run(
 
 @app.get("/api/runs", response_model=list[RunResponse], tags=["factory"])
 async def list_runs(
-    credentials: HTTPAuthorizationCredentials = Depends(),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
     session: AsyncSession = Depends(get_session),
 ) -> list[RunResponse]:
     require_user(credentials)
